@@ -8,6 +8,7 @@ import (
 )
 
 type BaseStruct struct {
+	ModelPkg   string
 	StructName string
 	TableName  string
 	Fields     []*model.Field

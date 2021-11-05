@@ -30,7 +30,7 @@ func (g G) GetStructFields(tableName string) (result []*model.Field, err error) 
 
 func getColumns(orm *gorm.DB, columnQuery string, schemaName string, tableName string) ([]*model.Column, error) {
 	result := make([]*model.Column, 0)
-	err := orm.Debug().Raw(columnQuery, schemaName, tableName).Scan(&result).Error
+	err := orm.Raw(columnQuery, schemaName, tableName).Scan(&result).Error
 
 	return result, err
 }
