@@ -5,9 +5,11 @@ import (
 	"github.com/yunboom/generate/datebase"
 	"github.com/yunboom/generate/internal/model"
 	"regexp"
+	"strings"
 )
 
 type BaseStruct struct {
+	S          string
 	ModelPkg   string
 	StructName string
 	TableName  string
@@ -28,6 +30,7 @@ func GenBaseStructs(db datebase.Database, tableName string, modelName string) (*
 		Fields:     fields,
 		TableName:  tableName,
 		StructName: modelName,
+		S:          strings.ToLower(modelName)[:1],
 	}
 
 	return &base, err

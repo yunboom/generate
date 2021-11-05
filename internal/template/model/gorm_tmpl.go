@@ -22,7 +22,7 @@ type {{.StructName}} struct {
 }
 
 // TableName {{.StructName}}'s table name
-func (*{{.StructName}}) TableName() string {
+func ({{.S}} *{{.StructName}}) TableName() string {
     return TableName{{.StructName}}
 }
 `

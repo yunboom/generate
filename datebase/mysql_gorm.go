@@ -1,0 +1,26 @@
+package datebase
+
+import (
+	"github.com/yunboom/generate/datebase/driver"
+	"github.com/yunboom/generate/internal/model"
+	"github.com/yunboom/generate/internal/model/column"
+	"gorm.io/gorm"
+)
+
+type MysqlGorm struct {
+	orm *gorm.DB
+	dsn string
+}
+
+func (g MysqlGorm) GetStructFields(tableName string) (result []*model.Field, err error) {
+	columns := make([]column.MysqlColumn, 0)
+	schemaName := driver.GetMysqlSchemaName(g.dsn)
+	if err = g.orm.Debug().Raw(driver.MysqlColumnQuery, schemaName, tableName).Scan(&columns).Error; err != nil {
+		return nil, err
+	}
+
+	for _, mysqlColumn := range columns {
+		result = append(result, mysqlColumn.ToField())
+	}
+	return result, nil
+}

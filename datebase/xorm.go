@@ -1,8 +1,7 @@
 package datebase
 
 import (
-	"github.com/yunboom/generate/datebase/driver"
-	"github.com/yunboom/generate/internal/model"
+	"github.com/yunboom/generate/internal/model/column"
 	"xorm.io/xorm"
 )
 
@@ -10,11 +9,7 @@ type X struct {
 	orm *xorm.Engine
 }
 
-func (x X) GetTbColumns(tableName string) (*model.Column, error) {
-	panic("implement me")
-}
-
-func NewX(orm driver.Driver) (*X, error) {
+func (x X) GetTbColumns(tableName string) (*column.MysqlColumn, error) {
 	panic("implement me")
 }
 
