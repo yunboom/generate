@@ -15,9 +15,32 @@ go代码生成
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. 生成结构体
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/yunboom/generate"
+	"github.com/yunboom/generate/datebase"
+	"github.com/yunboom/generate/datebase/driver"
+)
+
+func main() {
+	const MysqlDSN = "root:root@(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	generator := generate.New(generate.NewConfig(
+		generate.WithModelPath("../gen"), //model 代码输出路径
+	))
+	generator.UseDB(datebase.NewGorm(driver.Mysql, MysqlDSN))   //使用gorm mysql
+	generator.BindModel(generator.GenModelAs("users", "Users")) //绑定模型
+	if err := generator.Execute(); err != nil {
+		fmt.Println(err)
+	}
+}
+
+```
+2. xxxx
+3. xxxx
 
 #### 参与贡献
 
