@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/yunboom/generate/datebase"
 	"github.com/yunboom/generate/internal/check"
-	"github.com/yunboom/generate/internal/template/model"
+	tmpl "github.com/yunboom/generate/internal/template"
 	"golang.org/x/tools/imports"
 	"io"
 	"io/fs"
@@ -20,6 +20,7 @@ type Config struct {
 	db datebase.Database
 
 	ModelPath   string
+	MapperPath  string
 	ModelPkg    string
 	ServicePath string
 	HandlePath  string
@@ -28,6 +29,12 @@ type Config struct {
 func WithModelPath(modelPath string) CfgOpt {
 	return func(config *Config) {
 		config.ModelPath = modelPath
+	}
+}
+
+func WithMapperPath(mapperPath string) CfgOpt {
+	return func(config *Config) {
+		config.MapperPath = mapperPath
 	}
 }
 
@@ -108,23 +115,23 @@ func (gen *Generator) Execute() error {
 		return gen.Err
 	}
 
-	abs, err := filepath.Abs(gen.ModelPath)
-	if err != nil {
+	if err := gen.genModelFile(); err != nil {
 		return err
 	}
 
-	if err := mkdirAll(os.ModePerm, abs); err != nil {
-		return err
-	}
-
-	if err := gen.genModelFile(abs); err != nil {
+	if err := gen.genQueryFile(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (gen *Generator) genModelFile(outPath string) error {
+func (gen *Generator) genModelFile() error {
+	outPath, err := genAbsPath(gen.ModelPath)
+	if err != nil {
+		return err
+	}
+
 	outPath = fmt.Sprint(outPath, "/", filepath.Base(gen.ModelPkg), "/")
 
 	for _, baseStruct := range gen.Data {
@@ -137,12 +144,12 @@ func (gen *Generator) genModelFile(outPath string) error {
 
 		var buf bytes.Buffer
 		baseStruct.ModelPkg = gen.ModelPkg
-		if err := render(model.Template, &buf, baseStruct); err != nil {
+		if err := render(tmpl.ModelTemplate, &buf, baseStruct); err != nil {
 			return err
 		}
 
 		modelFile := fmt.Sprint(outPath, baseStruct.TableName, ".go")
-		fmt.Printf("\ngenerate model file path : %s \n", modelFile)
+		fmt.Printf("generate model file(table <%s> -> {%s.%s}): %s \n", baseStruct.TableName, baseStruct.ModelPkg, baseStruct.StructName, modelFile)
 		if err := gen.output(modelFile, buf.Bytes()); err != nil {
 			return err
 		}
@@ -159,6 +166,34 @@ func (gen *Generator) output(fileName string, content []byte) error {
 		return err
 	}
 	return outputFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, result)
+}
+
+func (gen *Generator) genQueryFile() error {
+	_, err := genAbsPath(gen.MapperPath)
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+
+	err = render(tmpl.HeaderTmpl, &buf, "mapper")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func genAbsPath(path string) (string, error) {
+	outPath, err := filepath.Abs(path)
+	if err != nil {
+		return outPath, err
+	}
+	if err := mkdirAll(os.ModePerm, outPath); err != nil {
+		return outPath, err
+	}
+
+	return outPath, nil
 }
 
 func outputFile(filename string, flag int, data []byte) error {

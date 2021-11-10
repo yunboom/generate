@@ -14,7 +14,7 @@ type PostgresGorm struct {
 
 func (p PostgresGorm) GetStructFields(tableName string) (result []*model.Field, err error) {
 	columns := make([]column.PostgresColumn, 0)
-	if err = p.orm.Debug().Raw(driver.PostgresColumnQuery, tableName).Scan(&columns).Error; err != nil {
+	if err = p.orm.Raw(driver.PostgresColumnQuery, tableName).Scan(&columns).Error; err != nil {
 		return nil, err
 	}
 
