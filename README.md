@@ -31,14 +31,15 @@ const MysqlDSN = "root:root@(localhost:3306)/test?charset=utf8mb4&parseTime=True
 const PostgresDSN = "host=localhost port=54321 user=postgres dbname=clubdb1 password=root sslmode=disable"
 
 func main() {
-	gen := generate.New(config.New(
-		config.WithModelPath("/Users/zonst/Downloads/"), //model 代码输出路径
-	))
-	gen.UseDB(datebase.OpenGorm(driver.Postgres, PostgresDSN))        //使用gorm Postgres
-	gen.BindModel(gen.GenModelAs("club_invite_log", "ClubInviteLog")) //绑定模型
-	if err := gen.Execute(); err != nil {
-		fmt.Println(err)
-	}
+   gen := generate.New(config.New(
+      config.WithModelPath("/Users/zonst/Downloads/"), //model 代码输出路径
+      config.WithDaoPath("/Users/zonst/Downloads/"),   //dao 代码输出路径
+   ))
+   gen.UseDB(datebase.OpenGorm(driver.Postgres, PostgresDSN)) //使用gorm mysql
+   gen.BindModel(gen.GenModelAs("users", "User"))             //绑定模型
+   if err := gen.Execute(); err != nil {
+      fmt.Println(err)
+   }
 }
 ```
 
