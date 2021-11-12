@@ -29,7 +29,7 @@ func (p PostgresColumn) ToField() *model.Field {
 
 func (p *PostgresColumn) buildGormTag() string {
 	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("column:%s;type:%s", p.ColumnName, p.ColumnType))
+	buf.WriteString(fmt.Sprintf("column:%s;type:%s", p.ColumnName, p.DataType))
 	if p.IsNullable != "YES" {
 		buf.WriteString(";not null")
 	}

@@ -1,60 +1,105 @@
 # generate
 
 #### 介绍
-go代码生成
 
-#### 软件架构
-软件架构说明
+go代码生成器、目标适配：
 
+1. Mysql、Postgresql与Gorm、Xorm
+2. 一键生成model、service、handle代码
+3. 生成Java Mybatis-Plus风格API
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```go get github.com/yunboom/generate```
 
 #### 使用说明
 
 1. 生成结构体
+
 ```go
 package main
 
 import (
 	"fmt"
 	"github.com/yunboom/generate"
+	"github.com/yunboom/generate/config"
 	"github.com/yunboom/generate/datebase"
 	"github.com/yunboom/generate/datebase/driver"
 )
 
+const MysqlDSN = "root:root@(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+const PostgresDSN = "host=localhost port=54321 user=postgres dbname=clubdb1 password=root sslmode=disable"
+
 func main() {
-	const MysqlDSN = "root:root@(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
-	generator := generate.New(generate.NewConfig(
-		generate.WithModelPath("../gen"), //model 代码输出路径
+	gen := generate.New(config.New(
+		config.WithModelPath("/Users/zonst/Downloads/"), //model 代码输出路径
 	))
-	generator.UseDB(datebase.NewGorm(driver.Mysql, MysqlDSN))   //使用gorm mysql
-	generator.BindModel(generator.GenModelAs("users", "Users")) //绑定模型
-	if err := generator.Execute(); err != nil {
+	gen.UseDB(datebase.OpenGorm(driver.Postgres, PostgresDSN))        //使用gorm Postgres
+	gen.BindModel(gen.GenModelAs("club_invite_log", "ClubInviteLog")) //绑定模型
+	if err := gen.Execute(); err != nil {
 		fmt.Println(err)
 	}
 }
-
 ```
-2. xxxx
-3. xxxx
 
-#### 参与贡献
+2. CRUD接口
+    1. Insert
+    ```go
+   // 插入一条记录
+    db, _ = gorm.Open(postgres.Open(PostgresDSN))
+    dao = NewUserDao(db.Debug())
+    err := dao.Insert(&User{
+    		Username: "123",
+    		Password: "123",
+    		Nick:     "张三",
+    	})
+   ```
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+    2. Update
 
+    ```go
+    //UPDATE "users" SET "password"='321' WHERE id = 123
+    err := dao.UpdateById(123, &User{Password: "321"})
+    ```
 
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+    3. Delete
+   
+    ```go
+       //DELETE FROM "users" WHERE id = 3
+       err := dao.DeleteById(3)
+       
+       //DELETE FROM "users" WHERE id in (5,6,7)
+       err := dao.DeleteBatchIds(5, 6, 7)
+       
+       //DELETE FROM "users" WHERE "users"."username" = '123' AND id > 10
+       wrapper := dao.QueryWrapper(&User{Username: "123"}).Where("id > ?", 10)
+       err := dao.DeleteByWrapper(wrapper)
+    ```
+   
+    4. Select
+   
+   ```go
+   //根据id查询
+   user, err := dao.SelectById(1)
+   
+   //查询所有 SELECT * FROM "users"
+   wrapper := dao.QueryWrapper(nil)
+   userList, err := dao.SelectList(wrapper)
+   
+   //SELECT * FROM "users" WHERE "users"."username" = '123' AND id > 0 ORDER BY id desc
+   wrapper := dao.QueryWrapper(&User{Username: "123"}).Where("id > ?", 0).OrderBy("id desc")
+   userList, err := dao.SelectList(wrapper)
+   
+   //SELECT * FROM "users" WHERE "users"."username" = '123' AND id > 10 ORDER BY "users"."id" LIMIT 1
+   wrapper := dao.QueryWrapper(&User{Username: "123"}).Where("id > ?", 10)
+   user, err := dao.SelectOne(wrapper)
+   
+   //SELECT count(*) FROM "users"
+   count, err := dao.SelectCount(dao.QueryWrapper(nil))
+   
+   //SELECT * FROM "users" LIMIT 2 OFFSET 1
+   userList, err := dao.SelectPage(2, 1, dao.QueryWrapper(nil))
+   
+   //[map[Id:1 Nick:张三 Password:123 Username:123] map[Id:2 Nick:李四 Password:456 Username:456]]
+   userMaps, err := dao.SelectMaps(dao.QueryWrapper(nil))
+   

@@ -20,7 +20,9 @@ func (g MysqlGorm) GetStructFields(tableName string) (result []*model.Field, err
 	}
 
 	for _, mysqlColumn := range columns {
-		result = append(result, mysqlColumn.ToField())
+		field := mysqlColumn.ToField()
+		field.Name = snakeToHump(field.ColumnName)
+		result = append(result, field)
 	}
 	return result, nil
 }

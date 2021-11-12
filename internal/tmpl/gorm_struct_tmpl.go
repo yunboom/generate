@@ -1,7 +1,7 @@
-package template
+package tmpl
 
-const ModelTemplate = NotEditMark + `
-package {{.ModelPkg}}
+const StructTemplate = NotEditMark + `
+package {{.PkgName}}
 
 import "time"
 

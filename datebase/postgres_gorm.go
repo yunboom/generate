@@ -19,7 +19,9 @@ func (p PostgresGorm) GetStructFields(tableName string) (result []*model.Field, 
 	}
 
 	for _, postgresColumn := range columns {
-		result = append(result, postgresColumn.ToField())
+		field := postgresColumn.ToField()
+		field.Name = snakeToHump(field.ColumnName)
+		result = append(result, field)
 	}
 	return result, nil
 }

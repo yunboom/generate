@@ -9,11 +9,12 @@ import (
 )
 
 type BaseStruct struct {
-	S          string
-	ModelPkg   string
-	StructName string
-	TableName  string
-	Fields     []*model.Field
+	S               string
+	PkgName         string
+	StructName      string
+	TableName       string
+	StructFieldName string
+	Fields          []*model.Field
 }
 
 func GenBaseStructs(db datebase.Database, tableName string, modelName string) (*BaseStruct, error) {
@@ -26,11 +27,13 @@ func GenBaseStructs(db datebase.Database, tableName string, modelName string) (*
 		return nil, err
 	}
 
+	s := strings.ToLower(modelName)[:1]
 	base := BaseStruct{
-		Fields:     fields,
-		TableName:  tableName,
-		StructName: modelName,
-		S:          strings.ToLower(modelName)[:1],
+		Fields:          fields,
+		TableName:       tableName,
+		StructName:      modelName,
+		StructFieldName: s + modelName[1:],
+		S:               s,
 	}
 
 	return &base, err
