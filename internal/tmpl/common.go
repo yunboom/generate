@@ -12,8 +12,8 @@ package {{.}}
 import(
 	"database/sql"
 
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
+	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm/schema"
 
 	"gorm.io/gen"
 	"gorm.io/gen/field"

@@ -9,7 +9,6 @@ import (
 	"golang.org/x/tools/imports"
 	"html/template"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -120,7 +119,7 @@ func render(tmpl string, wr io.Writer, data interface{}) error {
 	return t.Execute(wr, data)
 }
 
-func mkdirAll(perm fs.FileMode, path ...string) error {
+func mkdirAll(perm os.FileMode, path ...string) error {
 	for _, p := range path {
 		if _, err := os.Stat(p); err != nil {
 			if err := os.MkdirAll(p, perm); err != nil {

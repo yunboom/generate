@@ -4,7 +4,7 @@ const DaoTemplate = NotEditMark + `
 package {{.PkgName}}
 
 import (
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 type {{.StructName}}Wrapper struct {

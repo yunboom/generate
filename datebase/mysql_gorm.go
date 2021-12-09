@@ -1,10 +1,10 @@
 package datebase
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/yunboom/generate/datebase/driver"
 	"github.com/yunboom/generate/internal/model"
 	"github.com/yunboom/generate/internal/model/column"
-	"gorm.io/gorm"
 )
 
 type MysqlGorm struct {
